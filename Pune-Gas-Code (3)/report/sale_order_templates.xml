@@ -1,0 +1,88 @@
+<odoo>
+    <template id="report_saleorder_document_inherit_sale_management" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//div[@name='signature']" position="after">
+            <div class="table-responsive">
+            <h3 style="text-align: center; font-weight: bold; color: #212C5D; font-size:16px;padding-top:20px;margin-top:20px;">SUMMARY OF PROPOSAL</h3>
+                <table class="table table-sm" style="width: 100%; border-collapse: collapse;">
+                     <thead>
+                        <tr style="background-color:#fbbd1a; font-weight:bold;">
+                            <th style="width: 15%; text-align: center; font-weight:bold; color: #000000;">Section</th>
+                            <th style="width: 65%; text-align: center; font-weight:bold; color: #000000;">Description</th>
+                            <th style="width: 20%; text-align: center; font-weight:bold; color: #000000;">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <t t-set="current_section" t-value="''"/>
+                        <t t-set="section_total" t-value="0"/>
+                        <t t-set="index" t-value="0"/>
+                        <t t-foreach="doc.order_line" t-as="line">
+                            <t t-if="line.display_type == 'line_section'">
+                                <t t-if="current_section">
+                                    <tr>
+                                        <td style="width: 15%; text-align: center;"><t t-esc="chr(65 + index)"/></td>
+                                        <td style="width: 65%; text-align: left;padding-left:5px;"><t t-esc="current_section"/></td>
+                                        <td style="width: 20%; text-align: right;padding-right:10px;">
+                                            <t t-if="doc.currency_id"><t t-esc="doc.currency_id.symbol"/> </t>
+                                            <t t-esc="'{:,.2f}'.format(section_total)"/>
+                                        </td>
+                                    </tr>
+                                    <t t-set="index" t-value="index + 1"/>
+                                </t>
+                                <t t-set="current_section" t-value="line.name"/>
+                                <t t-set="section_total" t-value="0"/>
+                            </t>
+                            <t t-else="">
+                                <t t-set="section_total" t-value="section_total + (line.price_subtotal or 0)"/>
+                            </t>
+                        </t>
+                        <t t-if="current_section">
+                            <tr>
+                                <td style="width: 15%; text-align: center;"><t t-esc="chr(65 + index)"/></td>
+                                <td style="width: 65%; text-align: left;padding-left:5px;"><t t-esc="current_section"/></td>
+                                <td style="width: 20%; text-align: right;padding-right:10px;">
+                                    <t t-if="doc.currency_id"><t t-esc="doc.currency_id.symbol"/> </t>
+                                    <t t-esc="'{:,.2f}'.format(section_total)"/>
+                                </td>
+                            </tr>
+                        </t>
+                    </tbody>
+                    <tfoot>
+                        <tr style="background-color:#FDE3A7; font-weight:bold;">
+                            <td style="width: 15%; text-align: center;"></td>
+                           <td style="width: 65%; text-align: left; padding-left:5px; color: #000000;">Total Cost</td>
+                            <td style="width: 20%; text-align: right;padding-right:10px;">
+                                <t t-if="doc.currency_id"><t t-esc="doc.currency_id.symbol"/> </t>
+                                <t t-esc="'{:,.2f}'.format(doc.amount_untaxed)"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 15%; text-align: center;"></td>
+                            <td yle="width: 65%; text-align: left;padding-left:5px;">GST @ 18%</td>
+                            <td style="width: 20%; text-align: right;padding-right:10px;">
+                                <t t-if="doc.currency_id"><t t-esc="doc.currency_id.symbol"/> </t>
+                                <t t-esc="'{:,.2f}'.format(doc.amount_tax)"/>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="width: 15%; text-align: center;"></td>
+                            <td yle="width: 65%; text-align: left;padding-left:5px;">Grand Total</td>
+                            <td style="width: 20%; text-align: right;padding-right:10px;">
+                                <t t-if="doc.currency_id"><t t-esc="doc.currency_id.symbol"/> </t>
+                                <t t-esc="'{:,.2f}'.format(doc.amount_total)"/>
+                            </td>
+                        </tr>
+                        <tr>
+                          <td style="width: 15%; text-align: center;"></td>
+                            <td colspan="2" class="text-right">
+                                In words:
+                                 <span style="font-weight: bold; color: #000000;">
+                                <t t-esc="doc.currency_id.with_context(lang=doc.partner_id.lang).amount_to_text(doc.amount_total)"/>
+                                 </span>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </xpath>
+    </template>
+</odoo>

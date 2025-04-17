@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="report_saleorder_document_custom" inherit_id="sale.report_saleorder_document">
+        <xpath expr="//table[hasclass('table')" position="before">
+            <h3>Section-wise Subtotals</h3>
+            <table class="table table-sm mt32">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Section</th>
+                        <th class="text-end">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <t t-set="sections" t-value="{}"/>
+                    <t t-set="current_section" t-value="None"/>
+                    <t t-foreach="doc.order_line" t-as="line">
+                        <t t-if="line.display_type == 'line_section'">
+                            <t t-set="current_section" t-value="line.name"/>
+                            <t t-set="sections.update({line.name: 0})"/>
+                        </t>
+                        <t t-if="line.display_type == False and current_section">
+                            <t t-set="sections[current_section]" t-value="sections[current_section] + line.price_subtotal"/>
+                        </t>
+                    </t>
+                    <t t-set="index" t-value="0"/>
+                    <t t-foreach="sections.items()" t-as="section">
+                        <tr>
+                            <td>
+                                <t t-esc="chr(65 + index)"/>
+                            </td>
+                            <td>
+                                <strong><t t-esc="section[0]"/></strong>
+                            </td>
+                            <td class="text-end">
+                                <t t-esc="formatLang(section[1], currency_obj=doc.currency_id)"/>
+                            </td>
+                        </tr>
+                    </t>
+                </tbody>
+            </table>
+        </xpath>
+    </template>
+</odoo>
